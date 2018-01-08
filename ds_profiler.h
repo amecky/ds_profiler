@@ -236,10 +236,11 @@ namespace perf {
 		LARGE_INTEGER started = zoneTrackerCtx->started[index];
 		LARGE_INTEGER EndingTime;
 		QueryPerformanceCounter(&EndingTime);
-		LARGE_INTEGER time;
-		time.QuadPart = EndingTime.QuadPart - started.QuadPart;
-		zoneTrackerCtx->current[index] = time.QuadPart;
-		zoneTrackerCtx->accu[index] += zoneTrackerCtx->current[index] / 1000.0;
+		uint64_t timeDelta = EndingTime.QuadPart - started.QuadPart;
+		timeDelta *= TicksPerSecond;
+		timeDelta /= zoneTrackerCtx->frequency.QuadPart;
+		zoneTrackerCtx->current[index] = timeDelta / 10000;
+		zoneTrackerCtx->accu[index] += zoneTrackerCtx->current[index];
 	}
 
 	// -----------------------------------------------------------
